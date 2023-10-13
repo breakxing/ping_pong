@@ -4,7 +4,7 @@
 #include <mpi.h>
 #include <omp.h>
 #include <time.h>
-
+#include <math.h>
 #define NUM_MESSAGES 1000
 double total_time_all_thread;
 int main(int argc, char** argv) {
@@ -24,6 +24,10 @@ int main(int argc, char** argv) {
         }
         MPI_Finalize();
         return 0;
+    }
+    if(rank == 0)
+    {
+        printf("Message_Size\tStartup_Time(us)\tBandwidth\n");
     }
     for (i = 0; i < 25; i++) {
         message_sizes[i] = 1;
@@ -80,11 +84,15 @@ int main(int argc, char** argv) {
                 {
                     double startup_time = total_time_all_thread / (2 * NUM_MESSAGES * num_thread);
                     double bandwidth = (message_size * 1e-6) / startup_time * num_thread;
-
-                    printf("Message Size: %d bytes\n", message_size);
-                    printf("Startup Time: %.6f seconds\n", startup_time);
-                    printf("Bandwidth: %.6f MB/s\n", bandwidth);
-                    printf("===========================================\n");
+                    double mes_size_log = log(message_size) / log(2);
+                    if(mes_size_log >= 10)
+                    {
+                        printf("%-12d\t%-18d\t%-18d\n", (int)mes_size_log, (int)(startup_time * 1e6), (int)round(bandwidth));
+                    }
+                    // printf("Message Size: %d bytes\n", message_size);
+                    // printf("Startup Time: %.6f seconds\n", startup_time);
+                    // printf("Bandwidth: %.6f MB/s\n", bandwidth);
+                    // printf("===========================================\n");
                 }
             }
 

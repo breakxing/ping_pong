@@ -6,8 +6,8 @@ import os
 
 #Fill what benchmark you want to run
 benchmark = 'pp2_ori.c'
-USE_RDMA = 0
-USE_RDMA_CARD = 0
+USE_RDMA = 1
+USE_RDMA_CARD = 1
 
 RDMA_CARD1 = 'mlx5_1:1'
 RDMA_CARD2 = 'mlx5_3:1'
@@ -16,7 +16,7 @@ RDMA_TCP_CARD2 = 'enp4s0f1np1'
 MORMAL_TCP_CARD1 = 'eno2'
 MORMAL_TCP_CARD2 = 'enp0s31f6'
 hf = 'ib_hf'
-num_thread = 4
+num_thread = int(sys.argv[1])
 os.environ['OMP_NUM_THREADS'] = str(num_thread)
 
 
@@ -25,7 +25,7 @@ original_stdout = sys.stdout
 with open('run_pp2.sh', 'w') as f:
     sys.stdout = f
     if(benchmark == 'pp2_ori.c'):
-        print('mpicc pp2_ori.c -g -O3 -D_GNU_SOURCE -fopenmp -o pp2_ori')
+        print('mpicc pp2_ori.c -g -O3 -D_GNU_SOURCE -fopenmp -o pp2_ori -lm')
         print('scp -q ./pp2_ori rdma2:/home/paslab/mpi_rdma/')
         if(USE_RDMA):
             if not USE_RDMA_CARD:
@@ -45,7 +45,7 @@ with open('run_pp2.sh', 'w') as f:
     
     # Reset the standard output
     sys.stdout = original_stdout
-os.system('bash ./run_pp2.sh')
+os.system(f'bash ./run_pp2.sh > ./exp_data/RDMA_{num_thread}')
 
 
 

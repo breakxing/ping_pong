@@ -1,2 +1,4 @@
 stateVector/
 .vscode/
+exp_data/
+*.sh
